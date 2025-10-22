@@ -1,5 +1,7 @@
 package com.innovation.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.innovation.common.Result;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,10 +9,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
@@ -25,37 +29,44 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 关闭CSRF（前后端分离必需）
                 .csrf(csrf -> csrf.disable())
-                // 配置跨域
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // 配置请求授权
                 .authorizeHttpRequests(auth -> auth
-                        // 关键：放行所有用户相关接口（包含登录/注册），允许所有HTTP方法
-                        .requestMatchers("/api/user/**").permitAll()
-                        // 其他接口需要认证
+                        .requestMatchers("/api/user/**").permitAll() // 允许所有用户相关接口（包含退出登录）
                         .anyRequest().authenticated()
                 )
-                // 禁用默认的表单登录（避免拦截自定义登录接口）
                 .formLogin(form -> form.disable())
-                // 禁用默认的HTTP Basic认证
-                .httpBasic(basic -> basic.disable());
+                .httpBasic(basic -> basic.disable())
+                // 配置退出登录
+                .logout(logout -> logout
+                        .logoutUrl("/api/user/logout") // 退出登录接口
+                        .logoutSuccessHandler(logoutSuccessHandler()) // 退出成功处理
+                        .invalidateHttpSession(true) // 清除会话
+                        .clearAuthentication(true) // 清除认证信息
+                        .permitAll()
+                );
 
         return http.build();
+    }
+
+    // 退出成功处理器：返回JSON结果给前端
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return (request, response, authentication) -> {
+            response.setContentType("application/json;charset=UTF-8");
+            // 返回成功信息，前端据此跳转登录页
+            Result<String> result = Result.success("退出登录成功");
+            response.getWriter().write(new ObjectMapper().writeValueAsString(result));
+        };
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 允许前端地址（必须与前端实际运行地址一致）
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:8081"));
-        // 允许所有请求方法（包含预检OPTIONS）
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // 允许所有请求头
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        // 允许携带凭证
         configuration.setAllowCredentials(true);
-        // 预检请求缓存时间
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
