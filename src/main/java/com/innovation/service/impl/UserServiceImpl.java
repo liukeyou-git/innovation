@@ -46,4 +46,9 @@ public class UserServiceImpl implements UserService {
         // 插入数据库
         return userMapper.insert(user) > 0;
     }
+
+    @Override
+    public User selectByUsername(String username) {
+        return userMapper.selectByUsername(username);
+    }
 }

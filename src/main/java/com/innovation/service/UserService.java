@@ -12,4 +12,6 @@ public interface UserService {
      * 用户注册
      */
     boolean register(User user);
+
+    User selectByUsername(String username);
 }
