@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.innovation.mapper.ProjectMemberMapper">
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO project_member (
+        project_id, user_id, role_in_project, contribution
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.projectId}, #{item.userId}, #{item.roleInProject}, #{item.contribution})
+        </foreach>
+    </insert>
+
+    <select id="selectByProjectId" parameterType="Integer" resultType="com.innovation.entity.ProjectMember">
+        SELECT * FROM project_member WHERE project_id = #{projectId}
+    </select>
+</mapper>

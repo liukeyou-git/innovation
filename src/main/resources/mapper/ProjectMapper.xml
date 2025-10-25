@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.innovation.mapper.ProjectMapper">
+    <insert id="insertProject" parameterType="com.innovation.entity.Project" useGeneratedKeys="true" keyProperty="projectId">
+        INSERT INTO project (
+            project_name, description, teacher_id, apply_time,
+            start_time, end_time, status, create_time
+        ) VALUES (
+                     #{projectName}, #{description}, #{teacherId}, #{applyTime},
+                     #{startTime}, #{endTime}, #{status}, #{createTime}
+                 )
+    </insert>
+
+    <insert id="batchInsertProjectMembers" parameterType="java.util.List">
+        INSERT INTO project_member (
+        project_id, user_id, role_in_project, contribution
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.projectId}, #{item.userId}, #{item.roleInProject}, #{item.contribution})
+        </foreach>
+    </insert>
+
+    <select id="selectProjectsByStudentId" parameterType="Integer" resultType="com.innovation.entity.Project">
+        SELECT p.* FROM project p
+                            JOIN project_member pm ON p.project_id = pm.project_id
+        WHERE pm.user_id = #{studentId}
+        ORDER BY p.create_time DESC
+    </select>
+
+    <select id="selectProjectById" parameterType="Integer" resultType="com.innovation.entity.Project">
+        SELECT * FROM project WHERE project_id = #{projectId}
+    </select>
+
+    <select id="selectMembersByProjectId" parameterType="Integer" resultType="com.innovation.entity.ProjectMember">
+        SELECT * FROM project_member WHERE project_id = #{projectId}
+    </select>
+</mapper>
