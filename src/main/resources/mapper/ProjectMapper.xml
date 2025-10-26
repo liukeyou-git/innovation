@@ -40,4 +40,34 @@
     <select id="selectMembersByProjectId" parameterType="Integer" resultType="com.innovation.entity.ProjectMember">
         SELECT * FROM project_member WHERE project_id = #{projectId}
     </select>
+
+    <select id="selectProjectsByTeacherId" parameterType="Integer" resultType="com.innovation.entity.Project">
+        SELECT
+            p.*,
+            u.real_name as teacherName
+        FROM project p
+                 JOIN user u ON p.teacher_id = u.user_id
+        WHERE p.teacher_id = #{teacherId}
+        ORDER BY p.create_time DESC
+    </select>
+
+    <update id="updateProjectStatus">
+        UPDATE project
+        SET status = #{status}
+        WHERE project_id = #{projectId}
+    </update>
+
+    <select id="selectProjectsByTeacherIdAndStatus" resultType="com.innovation.entity.Project">
+        SELECT
+        p.*,
+        u.real_name as teacherName
+        FROM project p
+        JOIN user u ON p.teacher_id = u.user_id
+        WHERE p.teacher_id = #{teacherId}
+        AND p.status IN
+        <foreach collection="status" item="s" open="(" separator="," close=")">
+            #{s}
+        </foreach>
+        ORDER BY p.create_time DESC
+    </select>
 </mapper>

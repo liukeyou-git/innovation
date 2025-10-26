@@ -6,6 +6,12 @@ import java.time.LocalDate;
 
 @Data
 public class Project {
+
+    public static final int STATUS_PENDING = 0;      // 待审核
+    public static final int STATUS_APPROVED = 1;     // 已通过
+    public static final int STATUS_REJECTED = 2;     // 已驳回
+    public static final int STATUS_COMPLETED = 3;    // 已结题
+
     private Integer projectId; // 项目唯一标识
     private String projectName; // 项目名称
     private String description; // 项目描述

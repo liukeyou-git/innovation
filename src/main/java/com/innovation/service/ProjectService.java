@@ -30,4 +30,19 @@ public interface ProjectService {
      * 获取项目详情
      */
     Map<String, Object> getProjectDetail(Integer projectId);
+
+    /**
+     * 获取教师指导的项目列表
+     */
+    List<Project> getTeacherProjects(Integer teacherId);
+
+    /**
+     * 审核项目（更新状态）
+     */
+    boolean auditProject(Integer projectId, Integer status);
+
+    /**
+     * 根据教师ID和状态查询项目详情列表（包含学生信息）
+     */
+    List<Map<String, Object>> getTeacherProjectsByStatusWithDetails(Integer teacherId, Integer... status);
 }

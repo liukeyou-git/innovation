@@ -102,21 +102,95 @@ public class ProjectServiceImpl implements ProjectService {
         result.put("project", project);
 
         // 获取项目成员信息
-        List<ProjectMember> members = projectMapper.selectMembersByProjectId(projectId);
-        result.put("members", members);
+        List<ProjectMember> membersList = projectMapper.selectMembersByProjectId(projectId);
+        result.put("members", membersList);
 
         // 获取指导教师信息
         User teacher = userMapper.selectById(project.getTeacherId());
         result.put("teacher", teacher);
 
-        // 获取成员的用户信息
-        List<User> memberUsers = new ArrayList<>();
-        for (ProjectMember member : members) {
+        // 获取成员的用户信息并转换格式
+        List<Map<String, Object>> memberUsers = new ArrayList<>();
+        for (ProjectMember member : membersList) {
             User user = userMapper.selectById(member.getUserId());
-            memberUsers.add(user);
+            if (user != null) {
+                Map<String, Object> memberInfo = new HashMap<>();
+                memberInfo.put("userId", user.getUserId());
+                memberInfo.put("realName", user.getRealName());
+                memberInfo.put("studentId", user.getStudentId());
+                memberInfo.put("roleInProject", member.getRoleInProject());
+                memberInfo.put("contribution", member.getContribution());
+                memberUsers.add(memberInfo);
+            }
         }
         result.put("memberUsers", memberUsers);
 
+        // 获取申报学生信息（项目创建者，即第一个成员或负责人）
+        if (!membersList.isEmpty()) {
+            ProjectMember creatorMember = membersList.stream()
+                    .filter(m -> m.getRoleInProject() == 0) // 0表示负责人
+                    .findFirst()
+                    .orElse(membersList.get(0));
+
+            User creator = userMapper.selectById(creatorMember.getUserId());
+            if (creator != null) {
+                result.put("studentName", creator.getRealName());
+                result.put("studentId", creator.getStudentId());
+            }
+        }
+
+        // 添加提交时间（申报时间）
+        result.put("submitTime", project.getApplyTime());
+
         return result;
+    }
+
+    @Override
+    public List<Project> getTeacherProjects(Integer teacherId) {
+        return projectMapper.selectProjectsByTeacherId(teacherId);
+    }
+
+    @Transactional
+    @Override
+    public boolean auditProject(Integer projectId, Integer status) {
+        // 验证状态值是否合法
+        if (status < 1 || status > 4) {
+            throw new RuntimeException("无效的项目状态");
+        }
+        return projectMapper.updateProjectStatus(projectId, status) > 0;
+    }
+
+    @Override
+    public List<Map<String, Object>> getTeacherProjectsByStatusWithDetails(Integer teacherId, Integer... status) {
+        List<Project> projects = projectMapper.selectProjectsByTeacherIdAndStatus(teacherId, status);
+        List<Map<String, Object>> projectList = new ArrayList<>();
+
+        for (Project project : projects) {
+            Map<String, Object> projectInfo = new HashMap<>();
+            projectInfo.put("id", project.getProjectId());
+            projectInfo.put("projectName", project.getProjectName());
+            projectInfo.put("status", project.getStatus());
+            projectInfo.put("description", project.getDescription());
+            projectInfo.put("submitTime", project.getApplyTime());
+
+            // 获取申报学生信息
+            List<ProjectMember> members = projectMapper.selectMembersByProjectId(project.getProjectId());
+            if (!members.isEmpty()) {
+                ProjectMember creatorMember = members.stream()
+                        .filter(m -> m.getRoleInProject() == 0)
+                        .findFirst()
+                        .orElse(members.get(0));
+
+                User creator = userMapper.selectById(creatorMember.getUserId());
+                if (creator != null) {
+                    projectInfo.put("studentName", creator.getRealName());
+                    projectInfo.put("studentId", creator.getStudentId());
+                }
+            }
+
+            projectList.add(projectInfo);
+        }
+
+        return projectList;
     }
 }
