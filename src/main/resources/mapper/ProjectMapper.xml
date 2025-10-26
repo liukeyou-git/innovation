@@ -23,8 +23,12 @@
     </insert>
 
     <select id="selectProjectsByStudentId" parameterType="Integer" resultType="com.innovation.entity.Project">
-        SELECT p.* FROM project p
-                            JOIN project_member pm ON p.project_id = pm.project_id
+        SELECT
+            p.*,
+            u.real_name as teacherName  -- 关联查询教师姓名
+        FROM project p
+                 JOIN project_member pm ON p.project_id = pm.project_id
+                 JOIN user u ON p.teacher_id = u.user_id  -- 关联教师信息表
         WHERE pm.user_id = #{studentId}
         ORDER BY p.create_time DESC
     </select>

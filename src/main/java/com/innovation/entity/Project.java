@@ -15,4 +15,5 @@ public class Project {
     private LocalDate endTime; // 结束时间
     private Integer status; // 状态（0-申报中/1-已立项/2-进行中/3-已结题/4-已终止）
     private LocalDateTime createTime; // 创建时间
+    private String teacherName; // 新增：指导教师姓名（用于前端展示）
 }

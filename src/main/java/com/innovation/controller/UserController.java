@@ -10,10 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +27,24 @@ public class UserController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @GetMapping("/profile")
+    public Result<User> getCurrentUserProfile() {
+        try {
+            // 从Security上下文获取当前登录用户名
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.selectByUsername(username);
+
+            if (currentUser == null) {
+                return Result.fail("用户信息不存在");
+            }
+
+            // 返回用户信息（包含学号、班级等学生特有字段）
+            return Result.success(currentUser);
+        } catch (Exception e) {
+            return Result.fail("获取个人信息失败: " + e.getMessage());
+        }
+    }
 
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody User user) {

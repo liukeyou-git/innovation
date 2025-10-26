@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 放行登录、注册、退出登录接口
                         .requestMatchers("/api/user/login", "/api/user/register", "/api/user/logout").permitAll()
+                        .requestMatchers("/api/user/profile").authenticated()
                         // 项目相关接口需要认证
                         .requestMatchers("/api/teachers", "/api/students/search", "/api/projects/**", "/api/student/projects").authenticated()
                         .anyRequest().authenticated()
