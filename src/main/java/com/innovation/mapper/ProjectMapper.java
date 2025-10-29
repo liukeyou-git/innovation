@@ -5,6 +5,7 @@ import com.innovation.entity.ProjectMember;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -51,4 +52,17 @@ public interface ProjectMapper {
             @Param("teacherId") Integer teacherId,
             @Param("status") Integer... status
     );
+
+    /**
+     * 更新项目状态（用于结题操作，包含时间）
+     */
+    int updateProjectStatusWithTime(
+            @Param("projectId") Integer projectId,
+            @Param("status") Integer status,
+            @Param("completeTime") LocalDateTime completeTime);
+
+    /**
+     * 根据学生ID和状态查询项目列表
+     */
+    List<Project> selectProjectsByStudentIdAndStatus(Integer studentId, Integer status);
 }

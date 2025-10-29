@@ -2,6 +2,8 @@ package com.innovation.service;
 
 import com.innovation.entity.Project;
 import com.innovation.entity.User;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -45,4 +47,19 @@ public interface ProjectService {
      * 根据教师ID和状态查询项目详情列表（包含学生信息）
      */
     List<Map<String, Object>> getTeacherProjectsByStatusWithDetails(Integer teacherId, Integer... status);
+
+    /**
+     * 项目结题操作
+     */
+    boolean completeProject(Integer projectId, LocalDateTime completeTime);
+
+    /**
+     * 获取学生参与的已结题项目
+     */
+    List<Project> getStudentCompletedProjects(Integer studentId);
+
+    /**
+     * 获取教师指导的已结题项目详情列表
+     */
+    List<Map<String, Object>> getTeacherCompletedProjectsWithDetails(Integer teacherId);
 }

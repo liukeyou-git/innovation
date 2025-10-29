@@ -57,6 +57,13 @@
         WHERE project_id = #{projectId}
     </update>
 
+    <update id="updateProjectStatusWithTime">
+        UPDATE project
+        SET status = #{status},
+            complete_time = #{completeTime}
+        WHERE project_id = #{projectId}
+    </update>
+
     <select id="selectProjectsByTeacherIdAndStatus" resultType="com.innovation.entity.Project">
         SELECT
         p.*,
@@ -68,6 +75,18 @@
         <foreach collection="status" item="s" open="(" separator="," close=")">
             #{s}
         </foreach>
+        ORDER BY p.create_time DESC
+    </select>
+
+    <select id="selectProjectsByStudentIdAndStatus" resultType="com.innovation.entity.Project">
+        SELECT
+            p.*,
+            u.real_name as teacherName
+        FROM project p
+                 JOIN project_member pm ON p.project_id = pm.project_id
+                 JOIN user u ON p.teacher_id = u.user_id
+        WHERE pm.user_id = #{studentId}
+          AND p.status = #{status}
         ORDER BY p.create_time DESC
     </select>
 </mapper>

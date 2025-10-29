@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -102,6 +104,70 @@ public class ProjectController {
             }
         } catch (Exception e) {
             return Result.fail("获取项目详情失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 项目结题操作
+     */
+    @PutMapping("teacher/projects/{projectId}/complete")
+    public Result<String> completeProject(
+            @PathVariable Integer projectId,
+            @RequestBody Map<String, Object> completeData) {
+        try {
+            // 1. 获取前端传递的带时区的时间字符串（如：2025-10-29T14:38:04.005Z）
+            String completeTimeStr = (String) completeData.get("completeTime");
+
+            // 2. 使用OffsetDateTime解析带时区的时间（支持Z标识）
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(completeTimeStr);
+
+            // 3. 转换为LocalDateTime（去除时区信息，仅保留日期时间）
+            LocalDateTime completeTime = offsetDateTime.toLocalDateTime();
+
+            // 4. 执行结题操作
+            boolean success = projectService.completeProject(projectId, completeTime);
+            if (success) {
+                return Result.success("项目结题成功");
+            } else {
+                return Result.fail("项目结题失败");
+            }
+        } catch (Exception e) {
+            return Result.fail("结题处理失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取学生参与的已结题项目
+     */
+    @GetMapping("/student/projects/completed")
+    public Result<List<Project>> getStudentCompletedProjects() {
+        try {
+            // 获取当前登录用户ID
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.selectByUsername(username);
+            Integer studentId = currentUser.getUserId();
+
+            List<Project> projects = projectService.getStudentCompletedProjects(studentId);
+            return Result.success(projects);
+        } catch (Exception e) {
+            return Result.fail("获取已结题项目列表失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取教师指导的已结题项目
+     */
+    @GetMapping("teacher/projects/completed")
+    public Result<List<Map<String, Object>>> getCompletedProjects() {
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.selectByUsername(username);
+            Integer teacherId = currentUser.getUserId();
+
+            List<Map<String, Object>> completedProjects = projectService.getTeacherCompletedProjectsWithDetails(teacherId);
+            return Result.success(completedProjects);
+        } catch (Exception e) {
+            return Result.fail("获取已结题项目失败: " + e.getMessage());
         }
     }
 }

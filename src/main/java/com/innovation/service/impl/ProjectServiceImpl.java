@@ -193,4 +193,36 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectList;
     }
+
+    @Transactional
+    @Override
+    public boolean completeProject(Integer projectId, LocalDateTime completeTime) {
+        // 验证项目是否存在
+        Project project = projectMapper.selectProjectById(projectId);
+        if (project == null) {
+            throw new RuntimeException("项目不存在");
+        }
+
+        // 验证项目状态是否为"已通过"（只有已通过的项目才能结题）
+        if (project.getStatus() != Project.STATUS_APPROVED) {
+            throw new RuntimeException("只有已通过的项目才能进行结题操作");
+        }
+
+        // 执行更新操作，设置状态为已结题并记录时间
+        return projectMapper.updateProjectStatusWithTime(
+                projectId,
+                Project.STATUS_COMPLETED,
+                completeTime
+        ) > 0;
+    }
+
+    @Override
+    public List<Project> getStudentCompletedProjects(Integer studentId) {
+        return projectMapper.selectProjectsByStudentIdAndStatus(studentId, Project.STATUS_COMPLETED);
+    }
+
+    @Override
+    public List<Map<String, Object>> getTeacherCompletedProjectsWithDetails(Integer teacherId) {
+        return getTeacherProjectsByStatusWithDetails(teacherId, Project.STATUS_COMPLETED);
+    }
 }
