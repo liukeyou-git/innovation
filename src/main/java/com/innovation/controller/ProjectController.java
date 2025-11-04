@@ -1,8 +1,10 @@
 package com.innovation.controller;
 
 import com.innovation.common.Result;
+import com.innovation.entity.Achievement;
 import com.innovation.entity.Project;
 import com.innovation.entity.User;
+import com.innovation.service.AchievementService;
 import com.innovation.service.ProjectService;
 import com.innovation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class ProjectController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AchievementService achievementService;
 
     /**
      * 获取教师列表（供学生选择指导教师）
@@ -168,6 +173,19 @@ public class ProjectController {
             return Result.success(completedProjects);
         } catch (Exception e) {
             return Result.fail("获取已结题项目失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 查询项目成绩
+     */
+    @GetMapping("student/projects/{projectId}/achievement")
+    public Result<Achievement> getProjectAchievement(@PathVariable Integer projectId) {
+        try {
+            Achievement achievement = achievementService.getAchievementByProjectId(projectId);
+            return Result.success(achievement);
+        } catch (Exception e) {
+            return Result.fail("获取成绩失败: " + e.getMessage());
         }
     }
 }

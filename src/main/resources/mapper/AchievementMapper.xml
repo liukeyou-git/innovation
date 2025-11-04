@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.innovation.mapper.AchievementMapper">
+    <insert id="insertAchievement" parameterType="com.innovation.entity.Achievement" useGeneratedKeys="true" keyProperty="achievementId">
+        INSERT INTO achievement (
+            project_id, score, grade, teacher_comment,
+            evaluation_time, evaluator_id
+        ) VALUES (
+                     #{projectId}, #{score}, #{grade}, #{teacherComment},
+                     #{evaluationTime}, #{evaluatorId}
+                 )
+    </insert>
+
+    <update id="updateAchievement" parameterType="com.innovation.entity.Achievement">
+        UPDATE achievement
+        SET score = #{score},
+            grade = #{grade},
+            teacher_comment = #{teacherComment},
+            evaluation_time = #{evaluationTime},
+            evaluator_id = #{evaluatorId}
+        WHERE project_id = #{projectId}
+    </update>
+
+    <select id="selectByProjectId" parameterType="Integer" resultType="com.innovation.entity.Achievement">
+        SELECT * FROM achievement WHERE project_id = #{projectId}
+    </select>
+
+    <select id="selectByEvaluatorId" parameterType="Integer" resultType="com.innovation.entity.Achievement">
+        SELECT * FROM achievement
+        WHERE evaluator_id = #{evaluatorId}
+        ORDER BY evaluation_time DESC
+    </select>
+</mapper>

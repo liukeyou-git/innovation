@@ -5,10 +5,10 @@
 <mapper namespace="com.innovation.mapper.ProjectMapper">
     <insert id="insertProject" parameterType="com.innovation.entity.Project" useGeneratedKeys="true" keyProperty="projectId">
         INSERT INTO project (
-            project_name, description, teacher_id, apply_time,
+            project_name, description, teacher_id, teacher_name,apply_time,
             start_time, end_time, status, create_time
         ) VALUES (
-                     #{projectName}, #{description}, #{teacherId}, #{applyTime},
+                     #{projectName}, #{description}, #{teacherId}, #{teacherName} #{applyTime},
                      #{startTime}, #{endTime}, #{status}, #{createTime}
                  )
     </insert>

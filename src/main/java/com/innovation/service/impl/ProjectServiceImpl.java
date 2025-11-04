@@ -45,6 +45,8 @@ public class ProjectServiceImpl implements ProjectService {
             project.setProjectName((String) projectData.get("projectName"));
             project.setDescription((String) projectData.get("description"));
             project.setTeacherId((Integer) projectData.get("teacherId"));
+            User teacher = userMapper.selectById(project.getTeacherId());
+            project.setTeacherName(teacher.getRealName());
             project.setApplyTime(LocalDateTime.now());
 
             // 处理日期
