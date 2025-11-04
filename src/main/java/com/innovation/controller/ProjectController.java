@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -186,6 +188,42 @@ public class ProjectController {
             return Result.success(achievement);
         } catch (Exception e) {
             return Result.fail("获取成绩失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 学生查询个人所有项目成绩
+     */
+    @GetMapping("/student/achievements")
+    public Result<List<Map<String, Object>>> getStudentAllAchievements() {
+        try {
+            // 1. 获取当前登录学生ID
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.selectByUsername(username);
+            Integer studentId = currentUser.getUserId();
+
+            // 2. 获取学生参与的所有已结题项目（只有已结题项目有成绩）
+            List<Project> completedProjects = projectService.getStudentCompletedProjects(studentId);
+
+            // 3. 遍历项目查询对应成绩并封装结果
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            for (Project project : completedProjects) {
+                Map<String, Object> achievementInfo = new HashMap<>();
+                // 项目基本信息
+                achievementInfo.put("projectId", project.getProjectId());
+                achievementInfo.put("projectName", project.getProjectName());
+                achievementInfo.put("completeTime", project.getCompleteTime());
+
+                // 项目成绩信息
+                Achievement achievement = achievementService.getAchievementByProjectId(project.getProjectId());
+                achievementInfo.put("achievement", achievement);
+
+                resultList.add(achievementInfo);
+            }
+
+            return Result.success(resultList);
+        } catch (Exception e) {
+            return Result.fail("查询成绩失败: " + e.getMessage());
         }
     }
 }
