@@ -48,6 +48,7 @@ public class AchievementServiceImpl implements AchievementService {
         return achievementMapper.selectByProjectId(projectId);
     }
 
+    // 在AchievementServiceImpl中完善getTeacherAchievements方法（如果需要）
     @Override
     public List<Map<String, Object>> getTeacherAchievements(Integer teacherId) {
         List<Achievement> achievements = achievementMapper.selectByEvaluatorId(teacherId);
@@ -55,30 +56,33 @@ public class AchievementServiceImpl implements AchievementService {
 
         for (Achievement achievement : achievements) {
             Map<String, Object> item = new HashMap<>();
+            // 1. 封装成绩信息
             item.put("achievement", achievement);
 
-            // 获取项目信息
+            // 2. 封装项目信息（转换为Map，仅保留需要的字段）
             Project project = projectMapper.selectProjectById(achievement.getProjectId());
-            item.put("project", project);
-
-            // 新增：获取项目成员列表及用户详情
             if (project != null) {
-                List<ProjectMember> members = projectMapper.selectMembersByProjectId(project.getProjectId());
-                List<Map<String, Object>> memberUsers = new ArrayList<>();
-                for (ProjectMember member : members) {
-                    User user = userMapper.selectById(member.getUserId());
-                    if (user != null) {
-                        Map<String, Object> memberInfo = new HashMap<>();
-                        memberInfo.put("userId", user.getUserId());
-                        memberInfo.put("realName", user.getRealName());
-                        memberInfo.put("studentId", user.getStudentId()); // 学生学号
-                        memberInfo.put("roleInProject", member.getRoleInProject()); // 0-负责人/1-成员
-                        memberInfo.put("contribution", member.getContribution()); // 贡献描述
-                        memberUsers.add(memberInfo);
-                    }
-                }
-                item.put("members", memberUsers); // 加入成员列表
+                Map<String, Object> projectMap = new HashMap<>();
+                projectMap.put("projectId", project.getProjectId());
+                projectMap.put("projectName", project.getProjectName());
+                // 按需添加其他项目字段（如结题时间等）
+                item.put("project", projectMap); // 存入Map而非实体类
             }
+
+            // 3. 封装成员信息（转换为Map）
+            List<ProjectMember> members = projectMapper.selectMembersByProjectId(achievement.getProjectId());
+            List<Map<String, Object>> memberMaps = new ArrayList<>();
+            for (ProjectMember member : members) {
+                User user = userMapper.selectById(member.getUserId());
+                if (user != null) {
+                    Map<String, Object> memberMap = new HashMap<>();
+                    memberMap.put("realName", user.getRealName());
+                    memberMap.put("studentId", user.getStudentId());
+                    memberMap.put("roleInProject", member.getRoleInProject());
+                    memberMaps.add(memberMap);
+                }
+            }
+            item.put("members", memberMaps);
 
             result.add(item);
         }
