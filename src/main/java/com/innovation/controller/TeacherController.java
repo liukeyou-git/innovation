@@ -110,4 +110,19 @@ public class TeacherController {
             return Result.fail("获取项目详情失败: " + e.getMessage());
         }
     }
+
+    // 在TeacherController.java中添加接口
+    @GetMapping("/projects/completed/unscored")
+    public Result<List<Map<String, Object>>> getUnscoredCompletedProjects() {
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.selectByUsername(username);
+            Integer teacherId = currentUser.getUserId();
+
+            List<Map<String, Object>> unscoredProjects = projectService.getTeacherUnscoredCompletedProjects(teacherId);
+            return Result.success(unscoredProjects);
+        } catch (Exception e) {
+            return Result.fail("获取未评分已结题项目失败: " + e.getMessage());
+        }
+    }
 }

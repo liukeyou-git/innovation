@@ -1,10 +1,12 @@
 package com.innovation.service.impl;
 
+import com.innovation.entity.Achievement;
 import com.innovation.entity.Project;
 import com.innovation.entity.ProjectMember;
 import com.innovation.entity.User;
 import com.innovation.mapper.ProjectMapper;
 import com.innovation.mapper.UserMapper;
+import com.innovation.service.AchievementService;
 import com.innovation.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private AchievementService achievementService;
 
     @Override
     public List<User> getTeachersList() {
@@ -174,6 +179,7 @@ public class ProjectServiceImpl implements ProjectService {
             projectInfo.put("status", project.getStatus());
             projectInfo.put("description", project.getDescription());
             projectInfo.put("submitTime", project.getApplyTime());
+            projectInfo.put("completeTime", project.getCompleteTime());
 
             // 获取申报学生信息
             List<ProjectMember> members = projectMapper.selectMembersByProjectId(project.getProjectId());
@@ -226,5 +232,25 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Map<String, Object>> getTeacherCompletedProjectsWithDetails(Integer teacherId) {
         return getTeacherProjectsByStatusWithDetails(teacherId, Project.STATUS_COMPLETED);
+    }
+
+    // 在ProjectServiceImpl.java中实现方法
+    @Override
+    public List<Map<String, Object>> getTeacherUnscoredCompletedProjects(Integer teacherId) {
+        // 获取教师所有已结题项目
+        List<Map<String, Object>> completedProjects = getTeacherProjectsByStatusWithDetails(teacherId, Project.STATUS_COMPLETED);
+
+        // 过滤出未评分的项目
+        List<Map<String, Object>> unscoredProjects = new ArrayList<>();
+        for (Map<String, Object> project : completedProjects) {
+            Integer projectId = (Integer) project.get("id");
+            Achievement achievement = achievementService.getAchievementByProjectId(projectId);
+
+            // 如果没有成绩记录，即为未评分项目
+            if (achievement == null) {
+                unscoredProjects.add(project);
+            }
+        }
+        return unscoredProjects;
     }
 }

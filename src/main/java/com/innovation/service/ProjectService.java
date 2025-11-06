@@ -62,4 +62,10 @@ public interface ProjectService {
      * 获取教师指导的已结题项目详情列表
      */
     List<Map<String, Object>> getTeacherCompletedProjectsWithDetails(Integer teacherId);
+
+    // 在ProjectService.java中添加方法定义
+    /**
+     * 获取教师指导的已结题但未评分的项目
+     */
+    List<Map<String, Object>> getTeacherUnscoredCompletedProjects(Integer teacherId);
 }

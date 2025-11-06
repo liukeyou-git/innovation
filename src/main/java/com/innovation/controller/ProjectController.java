@@ -205,7 +205,7 @@ public class ProjectController {
             // 2. 获取学生参与的所有已结题项目（只有已结题项目有成绩）
             List<Project> completedProjects = projectService.getStudentCompletedProjects(studentId);
 
-            // 3. 遍历项目查询对应成绩并封装结果
+            // 3. 遍历项目查询对应成绩并封装结果（仅保留有成绩的项目）
             List<Map<String, Object>> resultList = new ArrayList<>();
             for (Project project : completedProjects) {
                 Map<String, Object> achievementInfo = new HashMap<>();
@@ -214,11 +214,12 @@ public class ProjectController {
                 achievementInfo.put("projectName", project.getProjectName());
                 achievementInfo.put("completeTime", project.getCompleteTime());
 
-                // 项目成绩信息
+                // 项目成绩信息（仅当成绩存在时才添加到结果中）
                 Achievement achievement = achievementService.getAchievementByProjectId(project.getProjectId());
-                achievementInfo.put("achievement", achievement);
-
-                resultList.add(achievementInfo);
+                if (achievement != null) {
+                    achievementInfo.put("achievement", achievement);
+                    resultList.add(achievementInfo);
+                }
             }
 
             return Result.success(resultList);
