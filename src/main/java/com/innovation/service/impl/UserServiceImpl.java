@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -50,5 +51,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public User selectByUsername(String username) {
         return userMapper.selectByUsername(username);
+    }
+
+    @Override
+    public List<User> getUsersByKeyword(String keyword) {
+        return userMapper.selectUsersByKeyword(keyword);
+    }
+
+    @Override
+    public boolean deleteUserById(Integer userId) {
+        return userMapper.deleteById(userId) > 0;
+    }
+
+    @Override
+    public boolean updateUser(User user) {
+        // 如果更新密码，需要重新加密
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            // 检查密码是否已加密（简单判断是否包含BCrypt特征字符）
+            if (!user.getPassword().startsWith("$2a$") &&
+                    !user.getPassword().startsWith("$2b$") &&
+                    !user.getPassword().startsWith("$2y$")) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+        }
+        return userMapper.update(user) > 0;
     }
 }

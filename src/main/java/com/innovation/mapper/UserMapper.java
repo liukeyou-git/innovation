@@ -2,6 +2,7 @@ package com.innovation.mapper;
 
 import com.innovation.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -31,4 +32,19 @@ public interface UserMapper {
      * 根据ID查询用户
      */
     User selectById(Integer userId);
+
+    /**
+     * 根据关键字搜索用户
+     */
+    List<User> selectUsersByKeyword(@Param("keyword") String keyword);
+
+    /**
+     * 根据ID删除用户
+     */
+    int deleteById(Integer userId);
+
+    /**
+     * 更新用户信息
+     */
+    int update(User user);
 }

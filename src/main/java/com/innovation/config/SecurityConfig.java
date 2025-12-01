@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/profile").authenticated()
                         // 项目相关接口需要认证
                         .requestMatchers("/api/teachers", "/api/students/search", "/api/projects/**", "/api/student/projects").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
