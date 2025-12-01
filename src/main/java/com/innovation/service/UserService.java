@@ -34,4 +34,7 @@ public interface UserService {
      * 更新用户信息
      */
     boolean updateUser(User user);
+
+    // com/innovation/service/UserService.java
+    boolean updateUserStatus(Integer userId, Integer status);
 }

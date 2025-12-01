@@ -18,4 +18,5 @@ public class User {
     private String phone;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private Integer status; // 0-禁用 1-启用
 }

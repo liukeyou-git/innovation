@@ -59,8 +59,16 @@
             <if test="department != null">department = #{department},</if>
             <if test="email != null">email = #{email},</if>
             <if test="phone != null">phone = #{phone},</if>
+            <if test="status != null">status = #{status},</if>
             update_time = #{updateTime}
         </set>
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE user
+        SET status = #{status},
+            update_time = #{updateTime}
         WHERE user_id = #{userId}
     </update>
 </mapper>

@@ -73,7 +73,17 @@ public class UserServiceImpl implements UserService {
                     !user.getPassword().startsWith("$2y$")) {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
             }
+        } else {
+            // 如果密码为空，不更新密码字段
+            user.setPassword(null);
         }
         return userMapper.update(user) > 0;
+    }
+
+    // com/innovation/service/impl/UserServiceImpl.java
+    @Override
+    public boolean updateUserStatus(Integer userId, Integer status) {
+        LocalDateTime now = LocalDateTime.now();
+        return userMapper.updateStatus(userId, status, now) > 0;
     }
 }

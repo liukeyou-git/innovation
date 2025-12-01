@@ -4,6 +4,7 @@ import com.innovation.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -47,4 +48,9 @@ public interface UserMapper {
      * 更新用户信息
      */
     int update(User user);
+
+    // com/innovation/mapper/UserMapper.java
+    int updateStatus(@Param("userId") Integer userId,
+                     @Param("status") Integer status,
+                     @Param("updateTime") LocalDateTime updateTime);
 }

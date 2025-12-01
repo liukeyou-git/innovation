@@ -12,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,36 @@ public class UserController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @PutMapping("/profile")
+    public Result<String> updateUserProfile(@RequestBody User user) {
+        try {
+            // 获取当前登录用户名
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User currentUser = userService.selectByUsername(username);
+
+            if (currentUser == null) {
+                return Result.fail("用户不存在");
+            }
+
+            // 确保只能修改自己的信息
+            user.setUserId(currentUser.getUserId());
+            // 禁止修改用户名和角色（普通用户无权限）
+            user.setUsername(null);
+            user.setRole(null);
+            // 更新时间
+            user.setUpdateTime(LocalDateTime.now());
+
+            boolean success = userService.updateUser(user);
+            if (success) {
+                return Result.success("个人信息更新成功");
+            } else {
+                return Result.fail("更新失败，请稍后重试");
+            }
+        } catch (Exception e) {
+            return Result.fail("更新个人信息失败: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/profile")
     public Result<User> getCurrentUserProfile() {

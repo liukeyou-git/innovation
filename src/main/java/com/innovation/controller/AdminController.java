@@ -19,6 +19,32 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
+    // com/innovation/controller/AdminController.java
+    /**
+     * 启用/禁用用户账号
+     */
+    @PutMapping("/users/{userId}/status")
+    public Result<String> updateUserStatus(
+            @PathVariable Integer userId,
+            @RequestBody Map<String, Integer> statusData) {
+        try {
+            Integer status = statusData.get("status");
+            if (status == null || (status != 0 && status != 1)) {
+                return Result.fail("请提供有效的状态值（0-禁用，1-启用）");
+            }
+
+            boolean success = userService.updateUserStatus(userId, status);
+            if (success) {
+                String message = status == 1 ? "用户账号已启用" : "用户账号已禁用";
+                return Result.success(message);
+            } else {
+                return Result.fail("更新用户状态失败");
+            }
+        } catch (Exception e) {
+            return Result.fail("处理用户状态失败: " + e.getMessage());
+        }
+    }
+
     /**
      * 获取用户列表（支持搜索）
      */
