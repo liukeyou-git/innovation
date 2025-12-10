@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
         LocalDateTime now = LocalDateTime.now();
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        user.setStatus(1);
         // 插入数据库
         return userMapper.insert(user) > 0;
     }

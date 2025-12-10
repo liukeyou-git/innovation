@@ -11,11 +11,11 @@
         INSERT INTO user (
             username, password, role, real_name,
             student_id, class_name, teacher_id, department,
-            email, phone, create_time, update_time
+            email, phone, create_time, update_time,status
         ) VALUES (
                      #{username}, #{password}, #{role}, #{realName},
                      #{studentId}, #{className}, #{teacherId}, #{department},
-                     #{email}, #{phone}, #{createTime}, #{updateTime}
+                     #{email}, #{phone}, #{createTime}, #{updateTime},#{status}
                  )
     </insert>
 

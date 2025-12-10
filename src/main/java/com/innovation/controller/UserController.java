@@ -4,18 +4,21 @@ import com.innovation.common.Result;
 import com.innovation.entity.User;
 import com.innovation.service.UserService;
 import com.innovation.utils.JwtUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -94,14 +97,24 @@ public class UserController {
             if (currentUser == null) {
                 return Result.fail("用户不存在");
             }
+            log.info("账号状态:{}", (currentUser.getStatus()));
+            int userStatus = currentUser.getStatus();
+            if (userStatus == 0 ) {
+                return Result.fail("账号已被禁用，请联系管理员");
+            }
 
             // 构建返回数据（包含token和角色）
             Map<String, Object> data = new HashMap<>();
             data.put("token", jwt);
             data.put("role", currentUser.getRole()); // 角色值（0-管理员，1-教师，2-学生）
+            data.put("status", userStatus);
 
             return Result.success(data);
+        } catch (UsernameNotFoundException e) {
+            // 捕获账号不存在或被禁用的异常
+            return Result.fail(e.getMessage());
         } catch (AuthenticationException e) {
+            // 其他认证失败（如密码错误）
             return Result.fail("用户名或密码错误");
         }
     }

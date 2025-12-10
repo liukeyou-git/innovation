@@ -73,6 +73,7 @@ public class AdminController {
                 LocalDateTime now = LocalDateTime.now();
                 user.setCreateTime(now);
                 user.setUpdateTime(now);
+                user.setStatus(1);
                 
                 // 尝试注册用户
                 if (userService.register(user)) {

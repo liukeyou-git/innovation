@@ -2,6 +2,7 @@ package com.innovation.entity;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 public class Achievement {
@@ -12,4 +13,5 @@ public class Achievement {
     private String teacherComment; // 教师评语
     private LocalDateTime evaluationTime; // 评定时间
     private Integer evaluatorId; // 评定教师ID
+    private Map<String, Object> tempData;
 }

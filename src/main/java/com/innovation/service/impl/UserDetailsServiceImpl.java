@@ -29,11 +29,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("用户名不存在");
         }
 
-        // 检查账号状态
-        if (user.getStatus() != null && user.getStatus() == 0) {
-            throw new UsernameNotFoundException("账号已被禁用，请联系管理员");
-        }
-
         // 根据用户角色设置权限（ROLE_前缀是Spring Security要求）
         List<String> roles = new ArrayList<>();
         if (user.getRole() == 0) {

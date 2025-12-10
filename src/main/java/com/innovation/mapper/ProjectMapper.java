@@ -65,4 +65,10 @@ public interface ProjectMapper {
      * 根据学生ID和状态查询项目列表
      */
     List<Project> selectProjectsByStudentIdAndStatus(Integer studentId, Integer status);
+
+    // 在ProjectMapper.java中添加
+    /**
+     * 根据项目名称查询项目
+     */
+    Project selectByProjectName(String projectName);
 }

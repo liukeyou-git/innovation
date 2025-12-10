@@ -89,4 +89,8 @@
           AND p.status = #{status}
         ORDER BY p.create_time DESC
     </select>
+
+    <select id="selectByProjectName" parameterType="String" resultType="com.innovation.entity.Project">
+        SELECT * FROM project WHERE project_name = #{projectName}
+    </select>
 </mapper>

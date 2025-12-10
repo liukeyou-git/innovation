@@ -32,4 +32,29 @@
         WHERE evaluator_id = #{evaluatorId}
         ORDER BY evaluation_time DESC
     </select>
+
+    <insert id="batchInsertAchievements" parameterType="java.util.List">
+        INSERT INTO achievement (
+        project_id, score, grade, teacher_comment,
+        evaluation_time, evaluator_id
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.projectId}, #{item.score}, #{item.grade}, #{item.teacherComment},
+            #{item.evaluationTime}, #{item.evaluatorId}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdateAchievements" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE achievement
+            SET score = #{item.score},
+            grade = #{item.grade},
+            teacher_comment = #{item.teacherComment},
+            evaluation_time = #{item.evaluationTime},
+            evaluator_id = #{item.evaluatorId}
+            WHERE project_id = #{item.projectId}
+        </foreach>
+    </update>
 </mapper>

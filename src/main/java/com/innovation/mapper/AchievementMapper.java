@@ -27,4 +27,14 @@ public interface AchievementMapper {
      * 根据教师ID查询其评定的成绩列表
      */
     List<Achievement> selectByEvaluatorId(Integer evaluatorId);
+
+    /**
+     * 批量插入成绩
+     */
+    int batchInsertAchievements(@Param("list") List<Achievement> achievements);
+
+    /**
+     * 批量更新成绩
+     */
+    int batchUpdateAchievements(@Param("list") List<Achievement> achievements);
 }
